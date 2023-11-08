@@ -1,0 +1,97 @@
+{% extends "admin/change_form.html" %}
+
+{% block content %}
+  <h1>Facturador Personalizado</h1>
+
+  <!-- Detalles de la Venta -->
+  <div class="module">
+    <h2>Detalles de la Venta</h2>
+    <table id="detalle-venta-table">
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Nombre</th>
+          <th>Cantidad</th>
+          <th>Precio Unitario</th>
+          <th>Descuento (%)</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Aquí mostrarás los productos agregados como filas de la tabla -->
+        {% for detalle in inline_admin_formset %}
+        <tr>
+          <td>{{ detalle.producto.codigo }}</td>
+          <td>{{ detalle.producto.nombre }}</td>
+          <td><input type="number" class="cantidad" value="{{ detalle.cantidad.value }}" data-precio="{{ detalle.producto.costo }}"></td>
+          <td>{{ detalle.producto.costo }}</td>
+          <td><input type="number" class="descuento" value="{{ detalle.descuento.value }}"></td>
+          <td class="total">{{ detalle.total.value }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Buscador para agregar productos -->
+  <div class="module">
+    <h2>Buscar y Agregar Productos</h2>
+    <input type="text" id="producto-buscador" placeholder="Buscar por código o nombre">
+    <ul id="resultados-busqueda">
+      <!-- Aquí mostrarás los resultados de la búsqueda -->
+    </ul>
+  </div>
+
+  <!-- Medio de Pago -->
+  <div class="module">
+    <h2>Medio de Pago</h2>
+    <table id="medio-pago-table">
+      <thead>
+        <tr>
+          <th>Cuenta</th>
+          <th>Importe</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Aquí mostrarás los medios de pago como filas de la tabla -->
+        <!-- Puedes iterar a través de MedioDePagoInline aquí -->
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  // JavaScript para calcular totales
+  const detalleVentaTable = document.getElementById("detalle-venta-table");
+  const cantidadInputs = detalleVentaTable.querySelectorAll(".cantidad");
+  const descuentoInputs = detalleVentaTable.querySelectorAll(".descuento");
+  const totalCells = detalleVentaTable.querySelectorAll(".total");
+
+  function calcularTotales() {
+    for (let i = 0; i < cantidadInputs.length; i++) {
+      const cantidad = parseFloat(cantidadInputs[i].value);
+      const precioUnitario = parseFloat(cantidadInputs[i].getAttribute("data-precio"));
+      const descuento = parseFloat(descuentoInputs[i].value);
+      const total = cantidad * precioUnitario * (1 - descuento / 100);
+      totalCells[i].textContent = total.toFixed(2);
+    }
+  }
+
+  cantidadInputs.forEach((input) => {
+    input.addEventListener("input", calcularTotales);
+  });
+  descuentoInputs.forEach((input) => {
+    input.addEventListener("input", calcularTotales);
+  });
+
+  // JavaScript para el buscador de productos
+  const productoBuscador = document.getElementById("producto-buscador");
+  const resultadosBusqueda = document.getElementById("resultados-busqueda");
+
+  productoBuscador.addEventListener("input", () => {
+    // Aquí puedes implementar la lógica para buscar productos
+    // y mostrar los resultados en la lista resultadosBusqueda
+  });
+</script>
+{% endblock %}

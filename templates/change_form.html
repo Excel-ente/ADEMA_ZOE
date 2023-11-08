@@ -1,0 +1,28 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_urls %}
+
+{% block filter %}
+  <div id="changelist-filter">
+    <h3>{% trans "Filter" %}</h3>
+    <form method="get" action="">
+      {% if cl.has_filters %}
+        <div style="display: none">
+          <select name="{{ cl.opts.pk.attname }}" multiple>
+            {% for spec in cl.filter_specs %}
+              <option value="{{ spec.choices.query_string }}">
+                {{ spec.title }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+      {% endif %}
+      {{ cl.form }}
+      <input type="submit" value="{% trans 'Apply filters' %}">
+      {% if cl.formset %}
+        <input type="hidden" name="{{ cl.formset.prefix }}-TOTAL_FORMS" value="{{ cl.formset.total_form_count }}">
+        <input type="hidden" name="{{ cl.formset.prefix }}-INITIAL_FORMS" value="{{ cl.formset.initial_form_count }}">
+        <input type="hidden" name="{{ cl.formset.prefix }}-MAX_NUM_FORMS" value="{{ cl.formset.max_num_form_count }}">
+      {% endif %}
+    </form>
+  </div>
+{% endblock %}
