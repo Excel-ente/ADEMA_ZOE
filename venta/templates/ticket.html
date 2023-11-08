@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+{% load humanize %}
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Ticket comandera</title>
+    <style>
+        /* Estilos para eliminar decoración de la lista */
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            text-decoration: none;
+        }
+        
+        /* Estilos para ajustar tamaño de fuente y espaciado */
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            margin: 0px;
+        }
+        
+        h1 {
+            font-size: 18px;
+            margin-bottom: 0px;
+        }
+        
+        h4 {
+            font-size: 10px;
+            margin: 0;
+        }
+        
+        hr {
+            border: 1px solid #000;
+            margin: 5px 0;
+        }
+        
+        ul li {
+            font-size: 12px;
+            margin-bottom: 3px;
+        }
+        
+        p, b {
+            font-size: 12px;
+        }
+
+    </style>
+</head>
+<body >
+    {% if venta.estado == 5 %}
+    <h1 style="color: red;">FACTURA ANULADA</h1>
+    {% endif %}
+
+    <h1>{{ empresa.empresa }}</h1>
+
+    <h4>{{ empresa.direccion }}</h4>
+    <h4>{{ empresa.telefono }}</h4>
+
+    <hr>
+    <p style="margin-bottom: 0;"><b>Nº Venta: </b>{{ venta.id }}</p>  
+    <p style="margin: 0;"><b>Cliente: </b>{{ venta.cliente }}</p>
+    {% if venta.cliente != None %}
+    <p style="margin: 0;"><b>Direccion:</b> {{ venta.cliente.direccion }}</p>
+    <p style="margin: 0;"><b>email:</b> {{ venta.cliente.email }}</p>
+    {% endif %}
+    <p style="margin: 0;"><b>Caja:</b> {{ venta.nombre_factura }}</p>
+    <p style="margin: 0;"><b>Fecha:</b> {{ venta.fecha }}</p>
+
+    <hr>
+    <h2>Detalles de la Venta:</h2>
+    <ul>
+        {% for detalle in venta.detalleventa_set.all %}
+        <li>{{ detalle.producto.nombre }} | {{ detalle.producto.descripcion }}</li>
+        <li><b>Cant:</b> {{ detalle.cantidad|floatformat:0 }}</li>
+        <li><b>Precio Unit:</b> $ {{ detalle.precio|floatformat:2|intcomma }}</li>
+        <li><b>Total: </b> $ {{ detalle.get_total|floatformat:2|intcomma }}</li>
+        <hr>
+        {% endfor %}
+    </ul>
+
+    <p class="total">Total Pesos: <b style="color: rgb(0, 0, 0); font-size: 14px;">${{ venta.get_cart_total|floatformat:2|intcomma }}</b></p>
+
+    <p> <b>¡Gracias por su compra!</b></p>
+</body>
+</html>

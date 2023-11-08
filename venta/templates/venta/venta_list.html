@@ -1,0 +1,154 @@
+{% extends 'core/base.html' %}
+{% load humanize %}
+{% block content %}
+
+<div class="container">
+    <div class="" style="text-align: start;">
+        <h1 class="text-light p-3" style="margin-top: 70px;"><b></b></h1>
+    </div>
+    <div class="card p-3 d-flex">   
+        
+        <div class="row justify-content-center">
+            <div class="col-8">
+                <div class="card" style="border: none;">
+                    <div class="card-body text-center">
+                        <form method="GET" action="">
+                            <div class="row">
+                                <div class="col-4">
+                                    <label for="" class="text-primary"><b>Desde</b></label>
+                                    <input type="date" id="desde" name="desde" class="form-control" value="{{ desde|date:'Y-m-d' }}">
+                                </div>
+                                <div class="col-4">
+                                    <label for="" class="text-primary"><b>Hasta</b></label>
+                                    <input type="date" id="hasta" name="hasta" class="form-control" value="{{ hasta|date:'Y-m-d'}}">
+                                </div>
+                                <div class="col-4">
+                                    <button type="submit" class="btn btn-primary">Filtrar</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="div col-4">
+                <div class="card" style="border: none;">
+                    <div class="card-body">
+                        <!--<h4 class="text-primary">Total</h4>
+                        <h4 class="text-danger"><b>$ {{ total_rango|intcomma }}</b></h4>-->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <div class="row justify-content-center mt-3">
+                <table class="table">
+                    <thead class="bg-primary" style="color: aliceblue;">
+                        <tr>
+                            <th scope="col"># Venta </th>
+                            <th scope="col">Fecha</th>
+                            <th scope="col">Caja</th>
+                            <th scope="col">Cliente</th>
+                            <th scope="col">Cantidad de productos</th>
+                            <th scope="col">Total Pesos</th> 
+                            <th scope="col">Estado</th>
+                            <th scope="col">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for venta in page %}
+                            {% if venta.detalleventa_set.all %}
+                                <tr>
+                                    <td class="text-primary"><b>    #{{ venta.pk }}</b></td>
+                                    <td>{{ venta.get_date }}</td>
+                                    
+                                    <td>{{venta.nombre_factura }}</td>
+                                    
+                                    {% if venta.cliente == None %}
+                                    <td>Cons. Final</td>
+                                    {% else %}
+                                    <td>{{ venta.cliente }}</td>
+                                    {% endif %}
+
+                                    <td>{{ venta.get_cart_items|floatformat:0 }}</td>
+                                    <td>$ {{ venta.get_cart_total|intcomma }}</td>
+                                    <!--<td>$ {{ venta.get_cart_total_dolares|intcomma }}</td>
+                                    <td>$ {{ venta.get_cart_total_bolivianos|intcomma }}</td>-->
+
+                                    {% if venta.estado == 1 %}
+                                    <td>Pagada</td>
+                                    {% endif %}
+                                    
+                                    {% if venta.estado == 2 %}
+                                    <td>Facturada</td>
+                                    {% endif %}
+                                    
+                                    {% if venta.estado == 3 %}
+                                    <td>Finalizada</td>
+                                    {% endif %}
+                                    
+                                    {% if venta.estado == 5 %}
+                                    <td>Anulada</td>
+                                    {% endif %}
+
+                                    <td>
+                                        {% if venta.estado != 5 %}
+                                        <a class="btn btn-danger" style="margin: 15px;" href="{% url 'venta:anular' venta.id %}">Anular</a>
+                                        {% endif %}
+                                        
+                                        <a class="btn btn-success" style="margin: 15px;"
+                                            href="{% url 'venta:imprimir_ticket' venta.id %}">Imprimir</a>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <div class="row mt-3 text-primary">
+                    <div class="col">
+                        <div class="pagination justify-content-center">
+                            <span class="step-links">
+                                {% if page.has_previous %}
+                                    <a href="?page=1" class="btn btn-primary btn-sm mb-3" style="margin-right: 20px;"><b>Primera Página</b></a>
+                                    <a href="?page={{ page.previous_page_number }}" class="btn btn-primary btn-sm mb-3" style="margin-right: 20px;"><b>Anterior</b></a>
+                                {% endif %}
+                
+                                <span class="current-page">
+                                    Page {{ page.number }} of {{ page.paginator.num_pages }}.
+                                </span>
+                
+                                {% if page.has_next %}
+                                    <a href="?page={{ page.next_page_number }}" class="btn btn-primary btn-sm mb-3" style="margin-left: 20px;"><b>Siguiente</b></a>
+                                    <a href="?page={{ page.paginator.num_pages }}" class="btn btn-primary btn-sm mb-3" style="margin-left: 20px;"><b>Última Página</b></a>
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>    
+    </div>
+</div>
+
+<script>
+
+function getCurrentDateFormatted() {
+  const today = new Date();
+  const currentDateFormatted = today.toISOString().split('T')[0];
+  return currentDateFormatted;
+}
+
+function setDefaultDates() {
+  const fechaDesdeInput = document.getElementById('desde');
+  const fechaHastaInput = document.getElementById('hasta');
+
+  fechaDesdeInput.value = getCurrentDateFormatted();
+  fechaHastaInput.value = getCurrentDateFormatted();
+}
+
+// Llama a la función para configurar los valores predeterminados cuando se cargue la página
+setDefaultDates();
+
+</script>
+{% endblock %}
